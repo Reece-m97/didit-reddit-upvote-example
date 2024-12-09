@@ -9,13 +9,25 @@ import {
   TbArrowBigUpFilled,
 } from "react-icons/tb";
 import { FaSpinner } from "react-icons/fa";
+import { useState } from "react";
 
 export function VoteButtons({ upvote, downvote, votes, existingVote }) {
   const { pending, data, method, action } = useFormStatus();
+  const [error, setError] = useState(null);
+
+  // Handle error
+  const handleVote = async (voteAction) => {
+    try {
+      setError(null);
+      await voteAction();
+    } catch (err) {
+      setError(err.message);
+    }
+  };
 
   return (
     <>
-      <button formAction={upvote}>
+      <button formAction={() => handleVote(upvote)}>
         {existingVote?.vote === 1 ? (
           <TbArrowBigUpFilled
             size={24}
@@ -41,7 +53,7 @@ export function VoteButtons({ upvote, downvote, votes, existingVote }) {
           votes
         )}
       </span>
-      <button formAction={downvote}>
+      <button formAction={() => handleVote(downvote)}>
         {existingVote?.vote === -1 ? (
           <TbArrowBigDownFilled
             size={24}
@@ -58,6 +70,7 @@ export function VoteButtons({ upvote, downvote, votes, existingVote }) {
           />
         )}
       </button>
+      {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
     </>
   );
 }
